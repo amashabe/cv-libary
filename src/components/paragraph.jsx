@@ -4,7 +4,7 @@ import { calculateSize } from '../utils/scale';
 
 const Paragraph = ({ children, color, size, fontWeight, textAlign, style }) => {
     return (
-        <Text numberOfLines={1} style={{ color: color, fontSize: calculateSize(size ? size : 14), fontFamily: fontWeight, textAlign: textAlign ? textAlign : 'center', ...style }} >
+        <Text numberOfLines={1} style={{ color: color, fontSize: calculateSize(size ? size : 14), fontWeight: fontWeight, textAlign: textAlign ? textAlign : 'center', ...style }} >
             {children}
         </Text>
     )
