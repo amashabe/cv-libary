@@ -1,11 +1,12 @@
-import React, { useState, Fragment } from "react";
-import { View, Image, TextInput, Text, TouchableOpacity, FlatList } from "react-native";
+import React, { useState } from "react";
+import { View, Image, Text, TouchableOpacity, FlatList } from "react-native";
 import _ from "lodash";
 import { Dropdown } from "react-native-element-dropdown";
 import Octicons from "@expo/vector-icons/Octicons";
 
 import { calculateSize } from "../utils/scale";
-import { ScreenContainer, InputText, Paragraph } from "../components";
+import { ScreenContainer, InputText, Paragraph, SearchResult, SearchBy } from "../components";
+import TabButton from "../components/tab-button";
 
 const data = [
   { label: "1 Mile", value: "1" },
@@ -55,8 +56,6 @@ const industries = [
   { label: "Financial Services" }
 ]
 
-      
-
 const HomeScreen = () => {
   const [value, setValue] = useState(null);
   const [activeTab, setActiveTab] = useState('Tab 1');
@@ -98,10 +97,6 @@ const HomeScreen = () => {
     setActiveTab(tab);
   };
 
-  const _renderItem = (item) => {
-    console.log(item)
-    return <Text style={{ flexBasis: "50%" }}>{item.label}</Text>
-  }
 
   return (
     <ScreenContainer>
@@ -120,9 +115,7 @@ const HomeScreen = () => {
                 <FlatList
                   data={suggestions}
                   renderItem={({ item }) => (
-                    <View style={{ paddingStart: calculateSize(10), justifyContent: "center", height: calculateSize(45), backgroundColor: "#FFFFFF" }}>
-                      <Text key={item.label} onPress={() => handleSelectLocation(item.label)} style={{ color: "#000" }}>{item.label}</Text>
-                    </View>
+                    <SearchResult handleSelectLocation={handleSelectLocation} item={item} />
                   )}
                   keyExtractor={(item, index) => index.toString()}
                 />}
@@ -161,42 +154,21 @@ const HomeScreen = () => {
         </View>
 
         <View style={{ flexDirection: "row", borderTopColor: "#4488D5", borderTopWidth: calculateSize(2) }}>
-          <Fragment>
-            <TouchableOpacity onPress={() => handleTabPress('Tab 1')} style={{ backgroundColor: activeTab === 'Tab 1' ? "#4488D5" : "transparent", height: calculateSize(46), width: "50%", justifyContent: "center" }}>
-              <Paragraph color={"#FFFFFF"} size={16}>Jobs by Location</Paragraph>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleTabPress('Tab 2')} style={{ backgroundColor: activeTab === 'Tab 2' ? "#4488D5" : "transparent", height: calculateSize(46), width: "50%", justifyContent: "center" }}>
-              <Paragraph color={"#FFFFFF"} size={16}>Jobs by Industry</Paragraph>
-            </TouchableOpacity>
-          </Fragment>
+          <TabButton
+            label="Jobs by Location"
+            onPress={() => handleTabPress('Tab 1')}
+            active={activeTab === 'Tab 1'}
+            customStyle={{ marginBottom: 10 }}
+          />
+          <TabButton
+            label="Jobs by Industry"
+            onPress={() => handleTabPress('Tab 2')}
+            active={activeTab === 'Tab 2'}
+            customStyle={{ marginBottom: 10 }}
+          />
         </View>
         <View style={{ marginTop: calculateSize(27), marginStart: calculateSize(20) }}>
-          {activeTab === 'Tab 1' ?
-            <View style={{ height: "100%", flexDirection: "row", flexGrow: "wrap" }}>
-              <FlatList
-                data={locations}
-                keyExtractor={this._keyExtractor}
-                renderItem={({ item }) => (
-                  <View style={{ flexBasis: "50%" }}>
-                    <Text style={{ color: "#FFFFFF", fontSize: calculateSize(16), marginBottom: calculateSize(5) }}>{item.label}</Text>
-                  </View>
-                )}
-                numColumns={2}
-              />
-            </View> :
-            <View style={{ height: "100%", flexDirection: "row", flexGrow: "wrap" }}>
-              <FlatList
-                data={industries}
-                keyExtractor={this._keyExtractor}
-                renderItem={({ item }) => (
-                  <View style={{ flexBasis: "50%" }}>
-                    <Text style={{ color: "#FFFFFF", fontSize: calculateSize(16), marginBottom: calculateSize(5) }}>{item.label}</Text>
-                  </View>
-                )}
-                numColumns={2}
-              />
-            </View>
-          }
+          <SearchBy data={activeTab === 'Tab 1' ? locations : industries} />
         </View>
       </View>
     </ScreenContainer>

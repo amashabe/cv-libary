@@ -5,14 +5,7 @@ import { calculateSize } from "../utils/scale";
 const InputText = ({ placeholder, onChangeText, value, children }) => {
   return (
     <View>
-      <Text
-        style={{
-          color: "#FFFFFF",
-          fontSize: calculateSize(16),
-          marginBottom: calculateSize(5),
-          marginTop: calculateSize(9),
-        }}
-      >
+      <Text style={{ color: "#FFFFFF", fontSize: calculateSize(16), marginBottom: calculateSize(5), marginTop: calculateSize(9), }}>
         {children}
       </Text>
       <TextInput
