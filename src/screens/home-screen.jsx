@@ -1,11 +1,23 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Image } from "react-native";
+import { calculateSize } from "../utils/scale";
+import { ScreenContainer } from "../components";
 
 const HomeScreen = () => {
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>HomeScreen</Text>
-    </View>
+    <ScreenContainer>
+      <View style={{ flex: 1, marginTop: calculateSize(50) }}>
+        <Image
+          style={{
+            backgroundColor: "transparent",
+            height: calculateSize(76),
+            width: calculateSize(200),
+            alignSelf: "center",
+          }}
+          source={require("../assets/logo.png")}
+        />
+      </View>
+    </ScreenContainer>
   );
 };
 
