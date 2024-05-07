@@ -1,5 +1,5 @@
 import React, { useState, Fragment } from "react";
-import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, Image, TextInput, Text, TouchableOpacity, FlatList } from "react-native";
 import _ from "lodash";
 import { Dropdown } from "react-native-element-dropdown";
 import Octicons from "@expo/vector-icons/Octicons";
@@ -25,9 +25,64 @@ const data = [
   { label: "750 Miles", value: "750" },
 ];
 
+const locations = [
+  { label: "Aberdeen" },
+  { label: "Derby" },
+  { label: "Basingstoke" },
+  { label: "Doncaster" },
+  { label: "Berkshire" },
+  { label: "Edinburgh" },
+  { label: "Birmingham" },
+  { label: "Essex" },
+  { label: "Bradford" },
+  { label: "Exeter" },
+  { label: "Bristol" },
+  { label: "Glasgow" }
+]
+
+const industries = [
+  { label: "Accounting" },
+  { label: "Distribution" },
+  { label: "Administration" },
+  { label: "Driving" },
+  { label: "Agriculture" },
+  { label: "Education" },
+  { label: "Arts" },
+  { label: "Electronics" },
+  { label: "Automotive" },
+  { label: "Engineering" },
+  { label: "Catering" },
+  { label: "Financial Services" }
+]
+
+      
+
 const HomeScreen = () => {
   const [value, setValue] = useState(null);
   const [activeTab, setActiveTab] = useState('Tab 1');
+  const [query, setQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+
+  const fetchSuggestions = async (input) => {
+    try {
+      const response = await fetch(`https://api.cv-library.co.uk/v1/locations?q=${input}`);
+      const data = await response.json();
+      setSuggestions(data);
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    }
+  };
+
+  const handleInputChange = (text) => {
+    setQuery(text);
+    fetchSuggestions(text);
+  };
+
+  const handleSelectLocation = (location) => {
+    setSuggestions([])
+    setQuery(location);
+  };
+
 
   const renderItem = (item) => {
     return (
@@ -43,20 +98,34 @@ const HomeScreen = () => {
     setActiveTab(tab);
   };
 
+  const _renderItem = (item) => {
+    console.log(item)
+    return <Text style={{ flexBasis: "50%" }}>{item.label}</Text>
+  }
+
   return (
     <ScreenContainer>
       <View style={{ flex: 1, marginTop: calculateSize(50) }}>
         <Image style={{ backgroundColor: "transparent", height: calculateSize(76), width: calculateSize(200), alignSelf: "center", }} source={require("../assets/logo.png")} />
-        <View style={{ flex: 1, marginStart: calculateSize(19), marginEnd: calculateSize(19), marginTop: calculateSize(40) }}>
-          <InputText onChangeText={() => { }} placeholder={"Keywords / Job Title / Job Ref"}>
+        <View style={{ marginStart: calculateSize(19), marginEnd: calculateSize(19), marginTop: calculateSize(40), marginBottom: calculateSize(25) }}>
+          <InputText placeholder={"Keywords / Job Title / Job Ref"}>
             Keywords / Job Title / Job Ref
           </InputText>
-
           <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: calculateSize(30) }}>
             <View style={{ width: "52%" }}>
-              <InputText onChangeText={() => { }} placeholder={"e.g. town or postcode"}>
+              <InputText value={query} onChangeText={handleInputChange} placeholder={"e.g. town or postcode"}>
                 Location
               </InputText>
+              {suggestions.length > 0 &&
+                <FlatList
+                  data={suggestions}
+                  renderItem={({ item }) => (
+                    <View style={{ paddingStart: calculateSize(10), justifyContent: "center", height: calculateSize(45), backgroundColor: "#FFFFFF" }}>
+                      <Text key={item.label} onPress={() => handleSelectLocation(item.label)} style={{ color: "#000" }}>{item.label}</Text>
+                    </View>
+                  )}
+                  keyExtractor={(item, index) => index.toString()}
+                />}
             </View>
 
             <View style={{ width: "43%" }}>
@@ -90,24 +159,45 @@ const HomeScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{ flex: 1, }}>
-          <View style={{ flexDirection: "row", borderTopColor: "#4488D5", borderTopWidth: calculateSize(2) }}>
-            <Fragment>
-              <TouchableOpacity onPress={() => handleTabPress('Tab 1')} style={{ backgroundColor: activeTab === 'Tab 1' ? "#4488D5" : "transparent", height: calculateSize(46), width: "50%", justifyContent: "center" }}>
-                <Paragraph color={"#FFFFFF"} size={16}>Jobs by Location</Paragraph>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleTabPress('Tab 2')} style={{ backgroundColor: activeTab === 'Tab 2' ? "#4488D5" : "transparent", height: calculateSize(46), width: "50%", justifyContent: "center" }}>
-                <Paragraph color={"#FFFFFF"} size={16}>Jobs by Industry</Paragraph>
-              </TouchableOpacity>
-            </Fragment>
-          </View>
-          <View style={{ marginTop: calculateSize(10) }}>
-            {activeTab === 'Tab 1' && <Text>Content for Tab 1</Text>}
-            {activeTab === 'Tab 2' && <Text>Content for Tab 2</Text>}
-          </View>
+
+        <View style={{ flexDirection: "row", borderTopColor: "#4488D5", borderTopWidth: calculateSize(2) }}>
+          <Fragment>
+            <TouchableOpacity onPress={() => handleTabPress('Tab 1')} style={{ backgroundColor: activeTab === 'Tab 1' ? "#4488D5" : "transparent", height: calculateSize(46), width: "50%", justifyContent: "center" }}>
+              <Paragraph color={"#FFFFFF"} size={16}>Jobs by Location</Paragraph>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleTabPress('Tab 2')} style={{ backgroundColor: activeTab === 'Tab 2' ? "#4488D5" : "transparent", height: calculateSize(46), width: "50%", justifyContent: "center" }}>
+              <Paragraph color={"#FFFFFF"} size={16}>Jobs by Industry</Paragraph>
+            </TouchableOpacity>
+          </Fragment>
         </View>
-
-
+        <View style={{ marginTop: calculateSize(27), marginStart: calculateSize(20) }}>
+          {activeTab === 'Tab 1' ?
+            <View style={{ height: "100%", flexDirection: "row", flexGrow: "wrap" }}>
+              <FlatList
+                data={locations}
+                keyExtractor={this._keyExtractor}
+                renderItem={({ item }) => (
+                  <View style={{ flexBasis: "50%" }}>
+                    <Text style={{ color: "#FFFFFF", fontSize: calculateSize(16), marginBottom: calculateSize(5) }}>{item.label}</Text>
+                  </View>
+                )}
+                numColumns={2}
+              />
+            </View> :
+            <View style={{ height: "100%", flexDirection: "row", flexGrow: "wrap" }}>
+              <FlatList
+                data={industries}
+                keyExtractor={this._keyExtractor}
+                renderItem={({ item }) => (
+                  <View style={{ flexBasis: "50%" }}>
+                    <Text style={{ color: "#FFFFFF", fontSize: calculateSize(16), marginBottom: calculateSize(5) }}>{item.label}</Text>
+                  </View>
+                )}
+                numColumns={2}
+              />
+            </View>
+          }
+        </View>
       </View>
     </ScreenContainer>
   );

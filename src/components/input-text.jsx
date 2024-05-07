@@ -2,7 +2,7 @@ import React from "react";
 import { TextInput, Text, View } from "react-native";
 import { calculateSize } from "../utils/scale";
 
-const InputText = ({ placeholder, children }) => {
+const InputText = ({ placeholder, onChangeText, value, children }) => {
   return (
     <View>
       <Text
@@ -17,9 +17,10 @@ const InputText = ({ placeholder, children }) => {
       </Text>
       <TextInput
         placeholderTextColor={"#333333"}
-        onChangeText={(input) => console.log(input, "x")}
+        onChangeText={(input) => onChangeText(input)}
         placeholder={placeholder}
         autoCorrect={false}
+        value={value}
         style={{
           borderColor: "#6D6D6D",
           borderWidth: calculateSize(1),
